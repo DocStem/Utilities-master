@@ -23,7 +23,7 @@ Class Scheduling Cloner Utility
 --------------------------------------
 	- Create a clone of one students schedule to another student or a group of other Active students.
 	- Pull historical schedules and have them convert to the current year Period Courses with proper Teacher and Period number.
-
+![screenshot](cloner.png)
 
 
 ### INSTALL

@@ -55,6 +55,13 @@ WHERE NOT EXISTS (SELECT profile_id
     WHERE modname='Utilities/Teacherchange.php'
     AND profile_id=1);
 
+-- First group is the Orders Preorders process
+INSERT INTO profile_exceptions (profile_id, modname, can_use, can_edit)
+SELECT 1, 'Utilities/scheduleCloner.php', 'Y', 'Y'
+WHERE NOT EXISTS (SELECT profile_id
+    FROM profile_exceptions
+    WHERE modname='Utilities/scheduleCloner.php'
+    AND profile_id=1);
 
 
 /**
