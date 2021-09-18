@@ -5,6 +5,22 @@
 DrawHeader( ProgramTitle() );
 
 if( User( 'PROFILE' ) === 'admin'){
+$canRun = true;
+		$warning = '';
+
+	//See if it time to save anything and Generate the new schedules
+	//echo('</pre>' . print_r($_REQUEST) . '</pre>');
+
+	if($_REQUEST['Generate'] == 'Generate'){
+		//echo('</pre>' . print_r($_REQUEST) . '</pre>');
+		//The last table is where any output from this click is going to write to. outputGenerate
+//echo( 'from year ' . $_REQUEST['fromYear']);
+		testGenerateStatus($canRun,$warning);
+		
+
+	}
+
+
 		//echo('<pre>' . print_r($_REQUEST) . '</pre>');
 
 		$info = 'This routine clones a current or past student schedule to current Active Student(s).</br> 
@@ -45,6 +61,18 @@ if( User( 'PROFILE' ) === 'admin'){
 
 		// ===================    Mock Up Screen =============================================
 
+
+		echo '<form action="'. URLEscape( 'Modules.php?modname=' . $_REQUEST['modname'] . '&modfunc=submit') . '" method="POST">';
+
+
+		$actionBar = '<button type="submit" name="Generate" value="Generate">Generate Schedules</button></br></br>';
+		//echo($actionBar);
+
+		$actionBar = '<div class="table-responsive"><table style=width:80%;align:center><tr><td>' . $actionBar . '</td></tr></table></div>';
+
+		echo($actionBar);
+
+		//The source from which data will come
 		$createFromYear = '<select id="fromYear" name="fromYear" style="width:400px;")">';
 		$createFromYear .= '<option value="NO" selected>   --- Select Clone Year Required ---   </option>';
 
@@ -79,7 +107,7 @@ if( User( 'PROFILE' ) === 'admin'){
 		$createFromSources .= '</select></br>';
 
 
-//====================================================================
+//===============================  Data Target  =====================================
 
 		$createToGrade = '<select id="ToGrade" name="ToGrade" style="width:400px;">';
 		$createToGrade .= '<option value="NO" selected>   --- Current Grade ---   </option>';
@@ -107,7 +135,101 @@ if( User( 'PROFILE' ) === 'admin'){
 
 		echo $headerTable;
 
-		
+		echo('</form>');
+
+// ==============================  Generation Output  ==================================
+?>
+	<table>
+		<tr><td><div id="outputGenerate">
+
+<?php echo( $warning);
+
+	if($canRun = true){
+		foreach($_REQUEST['targetStudents'] as $targetStudent){
+			echo(' have a number ' . $targetStudent);
+
+			foreach($_REQUEST['scheduleCourses'] as $course){
+				/* sets breaks down into
+				0 = OLDPERIOD
+				1 = NEWPERIOD
+				2 = OLDCOURSE
+				3 = NEWCOURSE
+				*/
+				$sets = explode('::',$course);
+				$oldPeriod = explode('==>',$sets[0]);
+				$newPeriod = explode('==>',$sets[1]);
+				$oldCourse = explode('==>',$sets[2]);
+				$newCourse = explode('==>',$sets[3]);
+
+				echo(' have a course ' . $sets[0]);
+				//Get the OLD Record to act as a template that will be modified
+				$oldRecord = DBGET("Select *
+							From schedule
+							Where course_period_id = '" . $oldPeriod[1] . "'
+							AND course_id = '" . $oldCourse[1] . "'
+							AND STUDENT_ID = '" . $_REQUEST['fromSources'] . "'"
+						);
+
+				//echo('<pre>' . print_r($oldRecord,true) . '</pre>');
+
+				//Validate that a new record does not exist
+				$newRecord = DBGET("Select *
+							From schedule
+							Where course_period_id = '" . $newPeriod[1] . "'
+							AND course_id = '" . $newCourse[1] . "'
+							AND STUDENT_ID = '" . $targetStudent . "'"
+						);
+
+				//echo('<pre>' . print_r($newRecord,true) . '</pre>');
+
+				if(empty($newRecord)){
+					/*Update the oldrecord fields to make them into what we need for this new year,
+					new record, new student 
+					Fields we want to update are 
+					SYEAR
+					STUDENT_ID
+					START_DATE == YYYY-MM-DD
+					COURSE_ID
+					COURSE_PERIOD_ID
+
+					*/
+					echo('</br></br>Scheduling Student ID: ' . $targetStudent . '</br>');
+					echo("       CLASS ID: " . $newPeriod[1] . '</br>');
+
+					$oldRecord[1]['SYEAR'] = UserSyear();
+					$oldRecord[1]['STUDENT_ID'] = $targetStudent;
+					$oldRecord[1]['COURSE_ID'] = $newCourse[1];
+					$oldRecord[1]['COURSE_PERIOD_ID'] = $newPeriod[1];
+					$oldRecord[1]['START_DATE'] = '2021-08-30';
+					$oldRecord[1]['CREATED_AT'] = NULL;
+
+					//echo('<pre>' . print_r($oldRecord,true) . '</pre>');
+
+					//Time to run an insert QUERY
+					DBQuery("INSERT INTO SCHEDULE
+						(SYEAR,SCHOOL_ID,STUDENT_ID,START_DATE,COURSE_ID,COURSE_PERIOD_ID,MP,MARKING_PERIOD_ID) 
+						VALUES(" . $oldRecord[1]['SYEAR'] . "," . 
+								$oldRecord[1]['SCHOOL_ID'] . "," .
+								$oldRecord[1]['STUDENT_ID'] . ",'" . 
+								$oldRecord[1]['START_DATE'] . "'," . 
+								$oldRecord[1]['COURSE_ID'] . "," . 
+								$oldRecord[1]['COURSE_PERIOD_ID'] . ",'" . 
+								$oldRecord[1]['MP'] . "','12')"
+					);
+
+
+				}//checking and updating oldRecord with new
+			}//Looking at each course cycling by each target student
+			
+		}//Looking at each target student
+	}// canRun is true and we process this
+
+?>
+		</div></td></tr>
+
+	</table>		
+
+<?php
 
 }else{ //your not an admin so go away.
 
@@ -120,6 +242,42 @@ if( User( 'PROFILE' ) === 'admin'){
 
 }
 
+
+
+
+//Test to see if we can do anything after Generate is hit.. Check all the input and output error messages.
+function testGenerateStatus(&$canRun,&$warning){
+	//This needs to become a function of all possible warnings.
+		if($_REQUEST['fromYear'] == 'NO'){
+			
+			$warning .= 'No Source Year Selected</br>';
+			$canRun = false;
+		}
+		if($_REQUEST['fromGrade'] == 'NO'){
+			$warning .= 'No Source Grade Selected</br>';
+			$canRun = false;
+		}
+		
+		if($_REQUEST['fromSources'] == 'NO'){
+			$warning .= 'No Source Student Selected</br>';
+			$canRun = false;
+		}
+		if($_REQUEST['ToGrade'] == 'NO'){
+			
+			$warning .= 'No Target Grade Selected</br>';
+			$canRun = false;
+		}
+		
+		if(empty($_REQUEST['fromSources']) || ! isset($_REQUEST['fromSources'])){
+			$warning .= 'No Source Courses Selected</br>';
+			$canRun = false;
+		}
+
+		 if(empty($_REQUEST['targetStudents'])){
+		 	$warning .= 'No Target Students Selected</br>';
+		 	$canRun = false;
+		 }
+}	
 
 function makeOptionSelects($singleArray,$values, $words = NULL){
 $Select = '';
@@ -179,10 +337,11 @@ function getStudents(sourceOrTarget,schoolid,currentyear){
 
 
 			if(sourceOrTarget == "Sources"){
-               $('#' + elem +'Sources').append(response);
+               $('#' + elem +'Sources').html(response);
            }else{
            	//alert(response);
-           	$('#ToStudents').append(response);
+        		var studentList = 
+           	$('#ToStudents').html(response);
            }
 
             },

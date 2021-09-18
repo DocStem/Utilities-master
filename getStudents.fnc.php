@@ -39,6 +39,8 @@ foreach ( $functions as $function )
 
 
 /* Determine the items in the where clause know that year is required */
+$createFromSelect = '';
+
 
 if(! empty($year)){
 	$whereClause = " AND se.SYEAR = '" . $year . "'";
@@ -66,6 +68,9 @@ if(! empty($lastname)){
 
 //easier for speed to do the if outside the loop
 	if($type == "selectOption"){
+
+		$createFromSelect = '<option value="NO" selected>   --- Possible Students ---   </option>';
+
 		foreach($students as $student){
 			$name = trim($student['FIRST_NAME'] . ' ' . $student['LAST_NAME']);
 
@@ -73,10 +78,12 @@ if(! empty($lastname)){
 								$student['STUDENT_ID'] .'">'  . $name . '</option>';
 		}
 	}else{
+
+		//$createFromSelect = '<div id="ToStudents"></div>';
 		foreach($students as $student){
 			$name = trim($student['FIRST_NAME'] . ' ' . $student['LAST_NAME']);
 
-			 $createFromSelect .= '<input type="checkbox" id="targetStudents[]" value="' .$student['STUDENT_ID'] . '">' . $name . '</input></br>';
+			 $createFromSelect .= '<input type="checkbox" id="targetStudents[]" name="targetStudents[]" value="' .$student['STUDENT_ID'] . '">' . $name . '</input></br>';
 		}
 	}
 	

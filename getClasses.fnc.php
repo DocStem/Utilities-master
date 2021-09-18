@@ -45,7 +45,7 @@ $sourceYear = $_POST['source_year'];
 
 /* === Find the students original course Periods   ====*/
 
-$originalCourses = DBGet("Select s.COURSE_PERIOD_ID, cp.TITLE, c.TITLE AS SUBJECT
+$originalCourses = DBGet("Select s.COURSE_PERIOD_ID, s.COURSE_ID, cp.TITLE, c.TITLE AS SUBJECT
                         FROM schedule s,
                         course_periods cp,
                         courses c
@@ -86,15 +86,15 @@ foreach($originalCourses as $originalCourse){
     $con = pg_connect( $connectstring );
      
 $complimentQuery = "WITH RECURSIVE periods AS (
-                        SELECT cp.course_period_id, cp.TITLE, cp.syear,cp.rollover_id,cp.school_id
+                        SELECT cp.COURSE_PERIOD_ID, cp.TITLE, cp.syear,cp.rollover_id,cp.school_id, cp.course_id
                         FROM course_periods cp
-                       WHERE cp.course_period_id = '" . $originalCourse['COURSE_PERIOD_ID'] . "'
+                       WHERE cp.COURSE_PERIOD_ID = '" . $originalCourse['COURSE_PERIOD_ID'] . "'
                     UNION ALL
-                        SELECT cpB.course_period_id, cpB.TITLE, cpB.syear, cpB.rollover_id, cpB.school_id
+                        SELECT cpB.COURSE_PERIOD_ID, cpB.TITLE, cpB.syear, cpB.rollover_id, cpB.school_id, cpB.course_id
                         FROM course_periods cpB
-                        JOIN periods ON cpB.rollover_id = periods.course_period_id
+                        JOIN periods ON cpB.rollover_id = periods.COURSE_PERIOD_ID
                         )
-                SELECT COURSE_PERIOD_ID, TITLE 
+                SELECT * 
                 FROM periods
                 WHERE syear = '" . $year . "'" ;
 
@@ -108,7 +108,7 @@ $currentCourses = pg_fetch_all($complimentResult);
 
        foreach($currentCourses as $currentCourse){
 
-             $selectCourses .= '<input type="checkbox" id="scheduleCourses[]" value="' .$originalCourse['COURSE_PERIOD_ID'] . '::' . $currentCourse['COURSE_PERIOD_ID'] . '"> PRIOR NAME  SUBJECT:: ' . $originalCourse['SUBJECT'] . ' COURSE:: ' . $originalCourse['TITLE'] . '<p>CURRENT NAME:: ' . $currentCourse['title'] .'</p></input></br></br>';
+             $selectCourses .= '<input type="checkbox" id="scheduleCourses[]" name="scheduleCourses[]" value="OLDPERIOD==>' .$originalCourse['COURSE_PERIOD_ID'] . '::NEWPERIOD==>' . $currentCourse['course_period_id'] . '::OLDCOURSE==>' . $originalCourse['COURSE_ID'] . '::NEWCOURSE==>' . $currentCourse['course_id'] . '"> PRIOR NAME  SUBJECT:: ' . $originalCourse['SUBJECT'] . ' COURSE:: ' . $originalCourse['TITLE'] . '<p>CURRENT NAME:: ' . $currentCourse['title'] .'</p></input></br></br>';
 
        }
        
