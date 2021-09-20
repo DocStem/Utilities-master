@@ -11,7 +11,7 @@ if( User( 'PROFILE' ) === 'admin'){
 			This module is not going to validate the teacher schedule for conflicts of period.</br></br>
 			Step 1 : Chose the teacher whose classes will be reassigned </br>
 			Step 2 : Click the checkbox next to the classes that will be reassigned </br>
-			Step 3 : Chose the new staff member that will teach that classes
+			Step 3 : Chose the new staff member that will teach that classes</br>
 			Step 4 : Hit the REASSIGN Button</br></br>';
 
 		$instructions = '<div class="table-responsive"><table style=width:80%;align:center><tr><td>' . $info . '</td></tr></table></div>';

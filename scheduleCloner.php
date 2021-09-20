@@ -18,12 +18,14 @@ $canRun = true;
 		testGenerateStatus($canRun,$warning);
 		
 
+	}else{
+		$canRun = false;
 	}
 
 
 		//echo('<pre>' . print_r($_REQUEST) . '</pre>');
 
-		$info = 'This routine clones a current or past student schedule to current Active Student(s).</br> 
+		$info = 'This routine clones a current or past student SCHEDULE to current Active Student(s).</br> 
 			The schedule shown for Clone Source Student will have both the original schedule Period names (if in the past) and the current Period names for identification purposes.</br></br>
 			<b> Make a system database backup prior to running the utility in the advent you make a mistake </b></br>
 			This module is not going to validate the number of students in the class or for conflicts of period.</br></br>
@@ -31,7 +33,7 @@ $canRun = true;
 			Step 2 : Click the class periods of the Clone Source or Select All</br>
 			Step 3 : Filter for Target Clone Students</br>
 			Step 4 : Click Target Students</br>
-			Step 5 : Process Schedules.</br></br>';
+			Step 5 : Process Schedules.(Generate Schedule) Last Step</br></br>';
 
 		$instructions = '<div class="table-responsive"><table style=width:80%;align:center><tr><td>' . $info . '</td></tr></table></div>';
 
@@ -100,7 +102,8 @@ $canRun = true;
 
 		$createFromGoButton =  '<button type="button" value="Sources" onclick="getStudents(this.value,' . UserSchool() .',null)">Populate Possible Sources</button></br></br>';
 
- 
+		
+		// === From sources is the creation of a possible list of students 
 		$createFromSources = '<select id="fromSources" name="fromSources" style="width:400px;" onchange="myName(this.value,' . UserSyear() . ',' . UserSchool(). ')">';
 		$createFromSources .= '<option value="NO" selected>   --- Possible Students ---   </option>';
 		
@@ -144,7 +147,7 @@ $canRun = true;
 
 <?php echo( $warning);
 
-	if($canRun = true){
+	if($canRun){
 		foreach($_REQUEST['targetStudents'] as $targetStudent){
 			echo(' have a number ' . $targetStudent);
 

@@ -6,11 +6,6 @@
 We could rebuild the database connection and the query call ability BUT then we need to modify it with every new module using AJAX
 */
 
-$year = $_POST['year'];
-$grade = $_POST['grade'];
-$lastname = $_POST['lastname'];
-$schoolid = $_POST['school_id'];
-
 /**
  * Load functions
  */
@@ -41,6 +36,11 @@ $studentid = $_POST['studentid'];
 $schoolid = $_POST['school_id'];
 $sourceYear = $_POST['source_year'];
 
+
+//$year = $_POST['year'];
+//$grade = $_POST['grade'];
+//$lastname = $_POST['lastname'];
+//$schoolid = $_POST['school_id'];
 
 
 /* === Find the students original course Periods   ====*/
