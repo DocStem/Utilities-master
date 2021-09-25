@@ -115,10 +115,10 @@ if( User( 'PROFILE' ) === 'admin'){
 		$createFromSelect = '<select id="fromTeacher" name="fromTeacher" style="width:400px;" onchange="myName(this.value,' . UserSYear() . ',' . UserSchool() .')">';
 		$createFromSelect .= '<option value="NO" selected>   --- Select From Teacher ---   </option>';
 
-		$createToSelect = '<select id="toTeacher" name="toTeacher" style="width:400px;" >';
+		$createToSelect = '<select id="toTeacher" name="toTeacher" style="width:400px;>';
 		$createToSelect .= '<option value="NO" selected>   --- Select To Teacher ---   </option>';
 
-
+	
 		foreach($teachers as $teacher){
 			
 			$selectValue = makeName($teacher['FIRST_NAME'],$teacher['MIDDLE_NAME'],$teacher['LAST_NAME']);
@@ -126,11 +126,12 @@ if( User( 'PROFILE' ) === 'admin'){
 			$createFromSelect .= '<option value="' . 
 							$teacher['STAFF_ID'] .'">'  . $selectValue . '</option>';
 
-			$createToSelect .= '<option value="' . 
+$createToSelect .= '<option value="' . 
 							$teacher['STAFF_ID'] .'">'  . $selectValue . '</option>';
-
-
 		}
+
+			
+
 		$createFromSelect .= '</select>';
 		$createToSelect .= '</select>';
 
@@ -173,8 +174,8 @@ function getTeacherInfo($list){
 	$teachers = DBGET("SELECT * 
 					FROM public.staff
 					Where upper(Profile) = 'TEACHER'
-					   AND SYEAR = " . UserSYear() ."
-					   AND CURRENT_SCHOOL_ID = " . UserSchool() . $addWHERE );
+					   AND SYEAR = " . UserSYear() .
+					   $addWHERE );
 
 	return $teachers;
 }

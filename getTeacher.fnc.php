@@ -10,6 +10,7 @@ $teacher = $_POST['info'];
 $schoolYear = $_POST['year'];
 $schoolid = $_POST['schoolid'];
 
+
 /**
  * Load functions
  */
@@ -42,7 +43,7 @@ if($teacher == 'NO'){
 	$coursesTable = '<table>';
 
 
-
+	
 	$fromTeacherCourses = DBGET("SELECT cp.*, c.TITLE As COURSE_TITLE
 		FROM public.course_periods cp,
 		public.courses c
@@ -55,9 +56,14 @@ if($teacher == 'NO'){
 
 	foreach($fromTeacherCourses as $course){
 		$courseCheckboxes .= '<tr><td><input type="checkbox" name="courses[]" value="' . $course['COURSE_PERIOD_ID'] . '" "checkox_value">' . $course['COURSE_TITLE'] . ' -- ' .$course['TITLE'] . ' </input></td></tr> ';
-	}
+		}
 
 	$coursesTable .= $courseCheckboxes . UserSchool() . '   ' . UserSYear() . '</table>'; 
+
+	
+
+
+	
 
 	echo $coursesTable;
 }
